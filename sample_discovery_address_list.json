@@ -1,0 +1,19 @@
+{
+  "mode": "address_list",
+  "addresses": [
+    {
+      "facility_name": "Killington Road Storage",
+      "address": "1700 Killington Rd",
+      "city": "Killington",
+      "state": "VT",
+      "county": "Rutland"
+    },
+    {
+      "facility_name": "Canandaigua Self Storage",
+      "address": "6000-6025 Denny Dr",
+      "city": "Canandaigua",
+      "state": "NY",
+      "county": "Ontario"
+    }
+  ]
+}

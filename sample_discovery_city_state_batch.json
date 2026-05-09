@@ -1,0 +1,7 @@
+{
+  "mode": "city_state_batch",
+  "city_state_pairs": [
+    { "city": "Charlevoix", "state": "MI" },
+    { "city": "Killington", "state": "VT" }
+  ]
+}

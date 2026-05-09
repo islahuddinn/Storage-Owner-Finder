@@ -1,0 +1,58 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Storage Owner Finder MVP</title>
+  <style>
+    body { font-family: Arial, sans-serif; max-width: 1000px; margin: 20px auto; padding: 0 16px; }
+    textarea { width: 100%; min-height: 220px; font-family: Consolas, monospace; }
+    select, button { padding: 8px; margin-top: 8px; }
+    .ok { color: #0a7d22; }
+    .error { color: #b00020; }
+    .box { border: 1px solid #ddd; padding: 12px; border-radius: 8px; margin: 14px 0; }
+    pre { background: #f6f6f6; padding: 8px; border-radius: 6px; overflow-x: auto; }
+  </style>
+</head>
+<body>
+  <h1>Storage Owner Finder MVP</h1>
+  <p>Run discovery or direct enrichment from browser.</p>
+
+  {% if error %}
+    <div class="box error"><strong>Error:</strong> {{ error }}</div>
+  {% endif %}
+  {% if success %}
+    <div class="box ok"><strong>{{ success }}</strong></div>
+  {% endif %}
+
+  <form method="post" action="/run">
+    <label for="mode"><strong>Input mode</strong></label><br />
+    <select id="mode" name="mode">
+      <option value="address_list" {% if default_mode == "address_list" %}selected{% endif %}>address_list (recommended)</option>
+      <option value="city_state_batch" {% if default_mode == "city_state_batch" %}selected{% endif %}>city_state_batch</option>
+      <option value="state_batch" {% if default_mode == "state_batch" %}selected{% endif %}>state_batch</option>
+      <option value="direct_run" {% if default_mode == "direct_run" %}selected{% endif %}>direct_run</option>
+    </select>
+    <p>Paste JSON payload for selected mode.</p>
+    <textarea name="payload_json">{{ default_payload }}</textarea><br />
+    <button type="submit">Run pipeline</button>
+  </form>
+
+  <div class="box">
+    <h3>Payload examples</h3>
+    <pre>address_list: [{"facility_name":"Killington Road Storage","address":"1700 Killington Rd","city":"Killington","state":"VT","county":"Rutland"}]</pre>
+    <pre>city_state_batch: [{"city":"Charlevoix","state":"MI"},{"city":"Killington","state":"VT"}]</pre>
+    <pre>state_batch: ["VT","MI","NY","CO"]</pre>
+    <pre>direct_run: same as address_list</pre>
+  </div>
+
+  {% if result %}
+    <div class="box">
+      <h3>Results (first 3)</h3>
+      <pre>{{ result[:3] | tojson(indent=2) }}</pre>
+      <p><strong>CSV:</strong> {{ csv_path }}</p>
+      <p><strong>Review queue:</strong> {{ review_queue_path }}</p>
+    </div>
+  {% endif %}
+</body>
+</html>

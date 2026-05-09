@@ -1,0 +1,5 @@
+{
+  "mode": "state_batch",
+  "states": ["VT", "MI", "NY", "CO"],
+  "region": "Northeast+Mountain sample"
+}

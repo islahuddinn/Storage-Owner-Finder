@@ -1,0 +1,50 @@
+[
+  {
+    "case_id": "charlevoix_mi_person_owner",
+    "facility_name": "Charlevoix Mini Storage",
+    "address": "Near Charlevoix Airport",
+    "city": "Charlevoix",
+    "state": "MI",
+    "county": "Charlevoix",
+    "expected_path": "person_direct",
+    "parcel_owner_raw": "Thomas Scherketter Family",
+    "expected_person": "Thomas Scherketter",
+    "notes": "Direct person lookup via people search."
+  },
+  {
+    "case_id": "killington_vt_llc_principal",
+    "facility_name": "Killington Road Storage",
+    "address": "1700 Killington Rd",
+    "city": "Killington",
+    "state": "VT",
+    "county": "Rutland",
+    "expected_path": "llc_principal",
+    "parcel_owner_raw": "802 Storage LLC",
+    "expected_person": "Josh Merrill",
+    "notes": "Vermont statewide map then LLC principal lookup."
+  },
+  {
+    "case_id": "canandaigua_ny_previous_owner_trap",
+    "facility_name": "Canandaigua Self Storage",
+    "address": "6000-6025 Denny Dr",
+    "city": "Canandaigua",
+    "state": "NY",
+    "county": "Ontario",
+    "expected_path": "llc_previous_owner_check",
+    "parcel_owner_raw": "A Safe Place Self Storage LLC 3",
+    "expected_person": "Paul Ginette",
+    "notes": "Prevent stale owner from facility brand history."
+  },
+  {
+    "case_id": "pagosa_co_entity_chain",
+    "facility_name": "All-Purpose Storage",
+    "address": "Pagosa Springs",
+    "city": "Pagosa Springs",
+    "state": "CO",
+    "county": "Archuleta",
+    "expected_path": "entity_chain",
+    "parcel_owner_raw": "Coastal King Limited",
+    "expected_person": "Robert Hart",
+    "notes": "Entity chain to general partner before people search."
+  }
+]
