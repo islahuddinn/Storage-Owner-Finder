@@ -27,7 +27,6 @@ web_output/
 .DS_Store
 Thumbs.db
 .idea/
-.vscode/
 
 # Large local artifacts
 *.mp4
@@ -35,3 +34,7 @@ Thumbs.db
 *.mkv
 *.avi
 *.webm
+temp_auto_push.bat
+temp_interactive_push.bat
+.gitignore
+branch_structure.json

@@ -11,12 +11,19 @@
     .ok { color: #0a7d22; }
     .error { color: #b00020; }
     .box { border: 1px solid #ddd; padding: 12px; border-radius: 8px; margin: 14px 0; }
-    pre { background: #f6f6f6; padding: 8px; border-radius: 6px; overflow-x: auto; }
+    pre { background: #f6f6f6; padding: 8px; border-radius: 6px; overflow-x: auto; font-size: 12px; }
+    .btn-row { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 10px; align-items: center; }
+    a.btn {
+      display: inline-block; padding: 8px 14px; background: #1a5fb4; color: #fff;
+      text-decoration: none; border-radius: 6px; font-size: 14px;
+    }
+    a.btn:hover { background: #0d3d82; }
+    .hint { color: #555; font-size: 14px; }
   </style>
 </head>
 <body>
   <h1>Storage Owner Finder MVP</h1>
-  <p>Run discovery or direct enrichment from browser.</p>
+  <p>Run discovery or direct enrichment from the browser. For <strong>city</strong> or <strong>state</strong> runs, facilities are discovered from OpenStreetMap (self-storage / storage-rental POIs), then owner enrichment runs per facility.</p>
 
   {% if error %}
     <div class="box error"><strong>Error:</strong> {{ error }}</div>
@@ -29,29 +36,41 @@
     <label for="mode"><strong>Input mode</strong></label><br />
     <select id="mode" name="mode">
       <option value="address_list" {% if default_mode == "address_list" %}selected{% endif %}>address_list (recommended)</option>
-      <option value="city_state_batch" {% if default_mode == "city_state_batch" %}selected{% endif %}>city_state_batch</option>
-      <option value="state_batch" {% if default_mode == "state_batch" %}selected{% endif %}>state_batch</option>
+      <option value="city_state_batch" {% if default_mode == "city_state_batch" %}selected{% endif %}>city_state_batch (all OSM storage in area)</option>
+      <option value="state_batch" {% if default_mode == "state_batch" %}selected{% endif %}>state_batch (OSM across state bbox, capped)</option>
       <option value="direct_run" {% if default_mode == "direct_run" %}selected{% endif %}>direct_run</option>
     </select>
-    <p>Paste JSON payload for selected mode.</p>
+    <p>Paste JSON: a <strong>list</strong>, or an <strong>object</strong> with options (see examples below).</p>
     <textarea name="payload_json">{{ default_payload }}</textarea><br />
     <button type="submit">Run pipeline</button>
   </form>
 
   <div class="box">
     <h3>Payload examples</h3>
-    <pre>address_list: [{"facility_name":"Killington Road Storage","address":"1700 Killington Rd","city":"Killington","state":"VT","county":"Rutland"}]</pre>
-    <pre>city_state_batch: [{"city":"Charlevoix","state":"MI"},{"city":"Killington","state":"VT"}]</pre>
-    <pre>state_batch: ["VT","MI","NY","CO"]</pre>
+    <p class="hint">Use two-letter state codes. For large areas, lower <code>max_facilities</code> or narrow <code>radius_meters</code> (city mode) to stay within Render time limits.</p>
+    <pre>address_list: [{"facility_name":"...","address":"...","city":"Canandaigua","state":"NY"}]</pre>
+    <pre>city_state_batch list: [{"city":"Canandaigua","state":"NY"}]</pre>
+    <pre>city_state_batch object: {"city_state_pairs":[{"city":"Canandaigua","state":"NY"}],"radius_meters":20000,"max_facilities":150,"use_osm_discovery":true}</pre>
+    <pre>state_batch: {"states":["NY","VT"],"max_facilities":200}</pre>
     <pre>direct_run: same as address_list</pre>
   </div>
 
+  {% if run_id %}
+    <div class="box">
+      <h3>Downloads</h3>
+      <p class="hint">Run id: <code>{{ run_id }}</code> — outputs are kept on the server for this run only (ephemeral on Render).</p>
+      <div class="btn-row">
+        <a class="btn" href="/download/{{ run_id }}/owner_leads.csv">Download owner_leads.csv</a>
+        <a class="btn" href="/download/{{ run_id }}/manual_review_queue.json">Download manual_review_queue.json</a>
+      </div>
+    </div>
+  {% endif %}
+
   {% if result %}
     <div class="box">
-      <h3>Results (first 3)</h3>
-      <pre>{{ result[:3] | tojson(indent=2) }}</pre>
-      <p><strong>CSV:</strong> {{ csv_path }}</p>
-      <p><strong>Review queue:</strong> {{ review_queue_path }}</p>
+      <h3>Results preview</h3>
+      <p>Total rows: <strong>{{ result_count }}</strong>. JSON below shows up to <strong>200</strong> rows; use CSV download for the full set.</p>
+      <pre>{{ result[:200] | tojson(indent=2) }}</pre>
     </div>
   {% endif %}
 </body>

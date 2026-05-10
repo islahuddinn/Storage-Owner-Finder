@@ -41,6 +41,10 @@ class DiscoveryRequest:
     city_state_pairs: List[dict] = field(default_factory=list)
     states: List[str] = field(default_factory=list)
     region: str = ""
+    # OSM discovery (Nominatim + Overpass): find all mapped self-storage POIs in area
+    radius_meters: int = 25_000
+    max_facilities: int = 200
+    use_osm_discovery: bool = True
 
 
 @dataclass(slots=True)
