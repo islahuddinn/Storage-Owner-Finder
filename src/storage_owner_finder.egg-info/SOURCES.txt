@@ -5,6 +5,7 @@ src/storage_owner_finder/cli.py
 src/storage_owner_finder/discovery.py
 src/storage_owner_finder/input_modes.py
 src/storage_owner_finder/models.py
+src/storage_owner_finder/osm_discovery.py
 src/storage_owner_finder/pipeline.py
 src/storage_owner_finder/spec.py
 src/storage_owner_finder/web.py

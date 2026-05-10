@@ -3,5 +3,8 @@
   "city_state_pairs": [
     { "city": "Charlevoix", "state": "MI" },
     { "city": "Killington", "state": "VT" }
-  ]
+  ],
+  "radius_meters": 25000,
+  "max_facilities": 150,
+  "use_osm_discovery": true
 }

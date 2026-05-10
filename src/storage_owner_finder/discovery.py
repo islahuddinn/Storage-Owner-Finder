@@ -4,6 +4,7 @@ from dataclasses import dataclass
 from typing import Iterable
 
 from storage_owner_finder.models import DiscoveryRequest, FacilityInput, InputMode
+from storage_owner_finder.osm_discovery import OSMStorageDiscovery
 
 
 STATE_CATALOG: dict[str, list[FacilityInput]] = {
@@ -52,9 +53,9 @@ class FacilityDiscoveryService:
         if request.mode == InputMode.ADDRESS_LIST:
             return self._from_addresses(request.addresses)
         if request.mode == InputMode.CITY_STATE_BATCH:
-            return self._from_city_state(request.city_state_pairs)
+            return self._from_city_state(request)
         if request.mode == InputMode.STATE_BATCH:
-            return self._from_states(request.states)
+            return self._from_states(request)
         raise ValueError(f"Unsupported mode: {request.mode}")
 
     def _from_addresses(self, addresses: Iterable[dict]) -> list[FacilityInput]:
@@ -71,19 +72,38 @@ class FacilityDiscoveryService:
             )
         return rows
 
-    def _from_city_state(self, city_state_pairs: Iterable[dict]) -> list[FacilityInput]:
+    def _from_city_state(self, request: DiscoveryRequest) -> list[FacilityInput]:
         discovered: list[FacilityInput] = []
-        for pair in city_state_pairs:
-            city = pair["city"].strip().lower()
+        osm = OSMStorageDiscovery()
+        for pair in request.city_state_pairs:
+            city = pair["city"].strip()
             state = pair["state"].strip().upper()
-            for facility in STATE_CATALOG.get(state, []):
-                if facility.city.lower() == city:
-                    discovered.append(facility)
+            radius = int(pair.get("radius_m", request.radius_meters))
+            max_f = int(pair.get("max_facilities", request.max_facilities))
+            found: list[FacilityInput] = []
+            if request.use_osm_discovery:
+                found = osm.discover_near_city(
+                    city, state, radius_m=radius, max_facilities=max_f
+                )
+            if not found:
+                for facility in STATE_CATALOG.get(state, []):
+                    if facility.city.lower() == city.lower():
+                        found.append(facility)
+            discovered.extend(found)
         return discovered
 
-    def _from_states(self, states: Iterable[str]) -> list[FacilityInput]:
+    def _from_states(self, request: DiscoveryRequest) -> list[FacilityInput]:
         discovered: list[FacilityInput] = []
-        for state in states:
-            discovered.extend(STATE_CATALOG.get(state.upper(), []))
+        osm = OSMStorageDiscovery()
+        per_state_cap = max(50, request.max_facilities)
+        for state in request.states:
+            st = state.strip().upper()
+            found: list[FacilityInput] = []
+            if request.use_osm_discovery:
+                found = osm.discover_in_state_bbox(
+                    st, max_facilities=per_state_cap
+                )
+            if not found:
+                found = list(STATE_CATALOG.get(st, []))
+            discovered.extend(found)
         return discovered
-

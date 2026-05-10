@@ -15,5 +15,8 @@ def load_discovery_request(path: Path) -> DiscoveryRequest:
         city_state_pairs=payload.get("city_state_pairs", []),
         states=payload.get("states", []),
         region=payload.get("region", ""),
+        radius_meters=int(payload.get("radius_meters", 25_000)),
+        max_facilities=int(payload.get("max_facilities", 200)),
+        use_osm_discovery=bool(payload.get("use_osm_discovery", True)),
     )
 
